@@ -1,4 +1,5 @@
 const Product = require("../models/productModels");
+const ErrorHander = require("../utils/errorhander");
 
 exports.createProduct = async (req, res, next) => {
 
@@ -21,6 +22,17 @@ exports.getAllProducts = async(req,res)=>{
   products
 })}
 
+exports.getProductByDetails = async (req, res, next) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    return next (new ErrorHander("Product not found",404))
+  }res.status(200).json({
+    success: true,
+    product
+  })
+  
+}
+
 exports.updateProduct = async (req, res, next) => {
   let product = await Product.findById(req.params.id)
 if(!product){
@@ -42,6 +54,24 @@ res.status(200).json({
 
 // 
 
+// exports.deleteProduct = (async (req, res, next) => {
+//   const product = await Product.findById(req.params.id);
+
+//   if (!product) {
+//     return next(new ErrorHander("Product not found", 404));
+//   }
+
+//   // Deleting Images From Cloudinary
+  
+//   await product.remove();
+//   console.log(product)
+
+//   res.status(200).json({
+//     success: true,
+//     message: "Product Delete Successfully",
+//   });
+// });
+
 exports.deleteProduct = (async (req, res, next) => {
   const product = await Product.findById(req.params.id);
 
@@ -51,7 +81,7 @@ exports.deleteProduct = (async (req, res, next) => {
 
   // Deleting Images From Cloudinary
   
-  await product.remove();
+  await Product.deleteOne({ _id: req.params.id });
   console.log(product)
 
   res.status(200).json({
